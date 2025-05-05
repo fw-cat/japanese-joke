@@ -1,0 +1,58 @@
+name: japanese-joke
+
+volumes:
+  db-store:
+  test-db-store:
+  node_modules:
+services:
+  front:
+    build:
+      context: ./infra/docker/node
+      dockerfile: ./Dockerfile
+    ports:
+      - 8081:5173
+    volumes:
+      - ./front:/var/www/app
+    tty: true
+
+  web:
+    platform: linux/arm64
+    build:
+      context: .
+      dockerfile: ./infra/docker/httpd-php/Dockerfile
+    ports:
+      - 8082:80
+    volumes:
+      - ./src:/var/www/html/src/
+      - ./infra/docker/httpd-php/php.ini:/usr/local/etc/php/php.ini
+    tty: true
+    links:
+      - mysql
+
+  mysql:
+    image: mysql
+    volumes:
+      - db-store:/var/lib/mysql
+    ports:
+      - 3316:3306
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: sercret
+      MYSQL_DATABASE: mysql_sample
+      MYSQL_USER: phper
+      MYSQL_PASSWORD: sercret
+
+  mysql_test:
+    image: mysql
+    volumes:
+      - test-db-store:/var/lib/mysql
+    ports:
+      - 3317:3306
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: sercret
+      MYSQL_DATABASE: mysql_test
+      MYSQL_USER: phper
+      MYSQL_PASSWORD: sercret
