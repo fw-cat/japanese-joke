@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { DajareSubmission } from '../../api/dajareService';
+import type { JapaneseJokePost } from '../../api/japaneseJokeService';
 
 const props = defineProps<{
-  submission: DajareSubmission
+  submission: JapaneseJokePost
 }>();
 
 const formattedDate = computed(() => {

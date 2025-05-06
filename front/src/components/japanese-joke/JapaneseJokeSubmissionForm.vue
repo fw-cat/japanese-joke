@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useToast } from 'vue-toastification';
-import { dajareService, type DajareTheme } from '../../api/dajareService';
+import { japaneseJokeService, type JapaneseJokeTheme } from '../../api/japaneseJokeService';
 
 const props = defineProps<{
-  currentTheme: DajareTheme | null
+  currentTheme: JapaneseJokeTheme | null
   onSubmitSuccess?: () => void
 }>();
 
@@ -31,7 +31,7 @@ const submitDajare = async () => {
   try {
     isSubmitting.value = true;
     
-    await dajareService.submitDajare({
+    await japaneseJokeService.submitDajare({
       theme_id: props.currentTheme.id,
       content: content.value,
       author_name: authorName.value || undefined,

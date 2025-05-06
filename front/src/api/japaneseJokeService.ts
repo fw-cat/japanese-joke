@@ -1,12 +1,12 @@
 import apiClient from './config'
 
-export interface DajareTheme {
+export interface JapaneseJokeTheme {
   id: number
   theme: string
   created_at: string
 }
 
-export interface DajareSubmission {
+export interface JapaneseJokePost {
   id: number
   theme_id: number
   content: string
@@ -14,19 +14,21 @@ export interface DajareSubmission {
   created_at: string
 }
 
-export const dajareService = {
+export const japaneseJokeService = {
   /**
    * Get a random dajare theme
    */
-  getRandomTheme: async (): Promise<DajareTheme> => {
-    const response = await apiClient.get('/dajare/theme/random')
-    return response.data
+  getRandomTheme: async (): Promise<JapaneseJokeTheme> => {
+    const response = await apiClient.get('/theme')
+    const themes: JapaneseJokeTheme[] = response.data
+    const randomIndex = Math.floor(Math.random() * themes.length)
+    return themes[randomIndex]
   },
 
   /**
    * Get submissions for a specific theme
    */
-  getSubmissions: async (themeId: number): Promise<DajareSubmission[]> => {
+  getSubmissions: async (themeId: number): Promise<JapaneseJokePost[]> => {
     const response = await apiClient.get(`/dajare/submissions/${themeId}`)
     return response.data
   },
@@ -38,7 +40,7 @@ export const dajareService = {
     theme_id: number, 
     content: string, 
     author_name?: string 
-  }): Promise<DajareSubmission> => {
+  }): Promise<JapaneseJokePost> => {
     const response = await apiClient.post('/dajare/submit', submission)
     return response.data
   }

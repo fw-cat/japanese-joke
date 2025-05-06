@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { dajareService, type DajareTheme } from '../../api/dajareService';
+import { japaneseJokeService, type JapaneseJokeTheme } from '../../api/japaneseJokeService';
 import LoadingSpinner from '../ui/LoadingSpinner.vue';
 
 const props = defineProps<{
-  onThemeLoaded?: (theme: DajareTheme) => void
+  onThemeLoaded?: (theme: JapaneseJokeTheme) => void
 }>();
 
-const currentTheme = ref<DajareTheme | null>(null);
+const currentTheme = ref<JapaneseJokeTheme | null>(null);
 const isLoading = ref(true);
 const isError = ref(false);
 const isAnimating = ref(false);
@@ -25,7 +25,7 @@ const loadRandomTheme = async () => {
       await new Promise(resolve => setTimeout(resolve, 100)); // Small delay
     }
     
-    const theme = await dajareService.getRandomTheme();
+    const theme = await japaneseJokeService.getRandomTheme();
     currentTheme.value = theme;
     
     if (props.onThemeLoaded) {
@@ -78,7 +78,7 @@ onMounted(() => {
             }"
           >
             <p class="text-3xl sm:text-4xl font-display font-bold text-primary-800 text-center my-6 leading-tight">
-              {{ currentTheme?.theme }}
+              {{ currentTheme }}
             </p>
           </div>
           

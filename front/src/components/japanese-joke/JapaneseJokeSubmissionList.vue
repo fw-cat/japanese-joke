@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
-import { dajareService, type DajareSubmission, type DajareTheme } from '../../api/dajareService';
+import { japaneseJokeService, type JapaneseJokePost, type JapaneseJokeTheme } from '../../api/japaneseJokeService';
 import LoadingSpinner from '../ui/LoadingSpinner.vue';
-import DajareSubmissionCard from './DajareSubmissionCard.vue';
+import JapaneseJokeSubmissionCard from './JapaneseJokeSubmissionCard.vue';
 
 const props = defineProps<{
-  currentTheme: DajareTheme | null
+  currentTheme: JapaneseJokeTheme | null
   refreshTrigger?: number
 }>();
 
-const submissions = ref<DajareSubmission[]>([]);
+const submissions = ref<JapaneseJokePost[]>([]);
 const isLoading = ref(true);
 const isError = ref(false);
 
@@ -24,7 +24,7 @@ const loadSubmissions = async () => {
     isLoading.value = true;
     isError.value = false;
     
-    const data = await dajareService.getSubmissions(props.currentTheme.id);
+    const data = await japaneseJokeService.getSubmissions(props.currentTheme.id);
     submissions.value = data;
   } catch (error) {
     console.error('Failed to load submissions:', error);
@@ -92,7 +92,7 @@ watch(() => props.refreshTrigger, () => {
       </div>
       
       <div v-else class="space-y-4">
-        <DajareSubmissionCard
+        <JapaneseJokeSubmissionCard
           v-for="submission in submissions"
           :key="submission.id"
           :submission="submission"

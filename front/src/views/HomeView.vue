@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import DajareTheme from '@/components/japanese-joke/DajareTheme.vue';
-import DajareSubmissionForm from '@/components/japanese-joke/DajareSubmissionForm.vue';
-import DajareSubmissionList from '@/components/japanese-joke/DajareSubmissionList.vue';
-import type { DajareTheme as DajareThemeType } from '@/api/dajareService';
+import JapaneseJokeTheme from '../components/japanese-joke/JapaneseJokeTheme.vue';
+import JapaneseJokeSubmissionForm from '../components/japanese-joke/JapaneseJokeSubmissionForm.vue';
+import JapaneseJokeSubmissionList from '../components/japanese-joke/JapaneseJokeSubmissionList.vue';
+import type { JapaneseJokeTheme as JapaneseJokeThemeType } from '../api/japaneseJokeService';
 
-const currentTheme = ref<DajareThemeType | null>(null);
+const currentTheme = ref<JapaneseJokeThemeType | null>(null);
 const refreshCounter = ref(0);
 
-const handleThemeLoaded = (theme: DajareThemeType) => {
+const handleThemeLoaded = (theme: JapaneseJokeThemeType) => {
   currentTheme.value = theme;
 };
 
@@ -28,18 +28,18 @@ const handleSubmitSuccess = () => {
           お題に合わせて面白いだじゃれを投稿しよう！
         </p>
         
-        <DajareTheme 
+        <JapaneseJokeTheme 
           :onThemeLoaded="handleThemeLoaded" 
         />
       </section>
       
       <section>
-        <DajareSubmissionForm 
+        <JapaneseJokeSubmissionForm 
           :currentTheme="currentTheme" 
           :onSubmitSuccess="handleSubmitSuccess"
         />
         
-        <DajareSubmissionList 
+        <JapaneseJokeSubmissionList 
           :currentTheme="currentTheme"
           :refreshTrigger="refreshCounter"
         />
