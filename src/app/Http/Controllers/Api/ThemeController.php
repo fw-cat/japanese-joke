@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\ThemeStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ThemeResource;
+use App\Models\Theme;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -14,9 +17,12 @@ class ThemeController extends Controller
      */
     public function index(): JsonResponse
     {
+        $themes = Theme::where([
+            'status' => ThemeStatus::ACTIVE,
+        ])->get();
+
         return new JsonResponse([
-            'くつ', 'さくらんぼ', 'かさ', 'いぬ', 'たまご',
-            'ゴールデンウィーク',  '五月晴れ', '五月病', 'こいのぼり', '梅雨前の晴れ',
+            'themes' => ThemeResource::collection($themes),
         ], Response::HTTP_OK);
     }
 

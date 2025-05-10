@@ -78,7 +78,7 @@ onMounted(() => {
             }"
           >
             <p class="text-3xl sm:text-4xl font-display font-bold text-primary-800 text-center my-6 leading-tight">
-              {{ currentTheme }}
+              {{ currentTheme?.theme }}
             </p>
           </div>
           

@@ -20,7 +20,7 @@ export const japaneseJokeService = {
    */
   getRandomTheme: async (): Promise<JapaneseJokeTheme> => {
     const response = await apiClient.get('/theme')
-    const themes: JapaneseJokeTheme[] = response.data
+    const themes: JapaneseJokeTheme[] = response.data.themes
     const randomIndex = Math.floor(Math.random() * themes.length)
     return themes[randomIndex]
   },
@@ -29,7 +29,7 @@ export const japaneseJokeService = {
    * Get submissions for a specific theme
    */
   getSubmissions: async (themeId: number): Promise<JapaneseJokePost[]> => {
-    const response = await apiClient.get(`/dajare/submissions/${themeId}`)
+    const response = await apiClient.get(`/posts/${themeId}`)
     return response.data
   },
 
@@ -41,7 +41,7 @@ export const japaneseJokeService = {
     content: string, 
     author_name?: string 
   }): Promise<JapaneseJokePost> => {
-    const response = await apiClient.post('/dajare/submit', submission)
+    const response = await apiClient.post('/posts', submission)
     return response.data
   }
 }
