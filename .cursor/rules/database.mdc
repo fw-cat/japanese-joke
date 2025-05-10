@@ -1,0 +1,168 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# データベース プロジェクトルール
+
+## 開発環境
+
+### バージョン
+- MySQL: 8.0.x
+- phpMyAdmin: 5.x
+- MySQL Workbench: 8.x
+
+### 必須設定
+- 文字コード: utf8mb4
+- 照合順序: utf8mb4_unicode_ci
+- タイムゾーン: Asia/Tokyo
+
+## コーディング規約
+
+### テーブル命名規則
+- テーブル名は複数形のスネークケース
+- 中間テーブルは`{テーブル1}_{テーブル2}`
+- 履歴テーブルは`{テーブル名}_history`
+- ログテーブルは`{テーブル名}_logs`
+
+### カラム命名規則
+- カラム名はスネークケース
+- 主キーは`id`
+- 外部キーは`{テーブル名}_id`
+- タイムスタンプは`created_at`、`updated_at`、`deleted_at`
+- フラグは`is_{状態}`
+
+### インデックス命名規則
+- 通常インデックス: `idx_{テーブル名}_{カラム名}`
+- ユニークインデックス: `unq_{テーブル名}_{カラム名}`
+- 外部キーインデックス: `fk_{テーブル名}_{参照テーブル名}`
+
+## テーブル設計
+
+### 基本ルール
+- 主キーは`id`（BIGINT UNSIGNED）
+- タイムスタンプは必須
+- ソフトデリートを実装
+- 外部キー制約を設定
+- インデックスを適切に設定
+
+### データ型
+- 整数: INT, BIGINT
+- 文字列: VARCHAR(255)
+- テキスト: TEXT
+- 日時: DATETIME
+- 真偽値: TINYINT(1)
+- 小数: DECIMAL(10,2)
+
+### 制約
+- NOT NULL制約
+- デフォルト値
+- 外部キー制約
+- ユニーク制約
+- チェック制約
+
+## マイグレーション
+
+### 命名規則
+- マイグレーション名は`{YYYY_MM_DD_HHMMSS}_{操作}_{テーブル名}`
+- 操作は`create`、`add`、`modify`、`drop`
+
+### 基本ルール
+- ロールバック可能な設計
+- 外部キーとインデックスは別マイグレーション
+- シーダーは別ファイル
+- 環境別の設定
+
+### マイグレーション例
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->rememberToken();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('users');
+    }
+};
+```
+
+## クエリ最適化
+
+### インデックス設計
+- 検索条件に使用するカラム
+- ソート条件に使用するカラム
+- 結合条件に使用するカラム
+- カーディナリティの高いカラム
+
+### クエリ最適化
+- 必要なカラムのみ取得
+- 適切な結合方法の選択
+- サブクエリの最適化
+- インデックスの活用
+
+### パフォーマンス
+- クエリの実行計画確認
+- スロークエリの監視
+- インデックスの使用状況確認
+- テーブル統計情報の更新
+
+## バックアップ
+
+### バックアップ方針
+- フルバックアップ: 日次
+- 増分バックアップ: 時間単位
+- バックアップの保持期間: 30日
+- バックアップの検証: 週次
+
+### バックアップ手順
+1. バックアップの作成
+2. バックアップの検証
+3. バックアップの転送
+4. バックアップの保管
+
+## セキュリティ
+
+### アクセス制御
+- 最小権限の原則
+- ユーザー権限の管理
+- パスワードポリシー
+- アクセスログの監視
+
+### データ保護
+- 機密データの暗号化
+- パスワードのハッシュ化
+- セキュアな接続
+- 定期的な監査
+
+## メンテナンス
+
+### 定期メンテナンス
+- テーブルの最適化
+- インデックスの再構築
+- 統計情報の更新
+- ログのローテーション
+
+### モニタリング
+- パフォーマンスモニタリング
+- エラーログの監視
+- リソース使用状況の監視
+- アラートの設定

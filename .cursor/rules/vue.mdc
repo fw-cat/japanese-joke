@@ -1,0 +1,293 @@
+---
+description: 
+globs: *.js,*.vue,*.ts
+alwaysApply: false
+---
+# Vue.js プロジェクトルール
+
+## 開発環境
+
+### バージョン
+- Vue.js: 3.x
+- Node.js: 18.x以降
+- npm: 9.x以降
+
+### 必須パッケージ
+- Vue Router
+- Pinia
+- TypeScript
+- ESLint
+- Prettier
+- Vite
+
+## コーディング規約
+
+### 基本ルール
+- TypeScriptを使用
+- コンポーネントはComposition APIを使用
+- インデントは2スペース
+- 行の最大長は100文字
+- セミコロンは必須
+- シングルクォートを使用
+- 型定義は必須
+
+### 命名規則
+
+#### コンポーネント
+- コンポーネント名はPascalCase
+- ファイル名はPascalCase
+- ベースコンポーネントは`Base`プレフィックス
+- レイアウトコンポーネントは`Layout`プレフィックス
+- ページコンポーネントは`Page`サフィックス
+
+#### 変数・メソッド
+- 変数名はcamelCase
+- メソッド名はcamelCase
+- 定数はUPPER_SNAKE_CASE
+- プライベートメソッドは`_`プレフィックス
+- ブール値を返すメソッドは`is`、`has`、`can`で始める
+
+#### ファイル名
+- コンポーネントファイルは`{コンポーネント名}.vue`
+- 型定義ファイルは`{型名}.d.ts`
+- テストファイルは`{コンポーネント名}.spec.ts`
+
+## アプリケーション構造
+
+### ディレクトリ構成
+```
+src/
+├── assets/
+│   ├── images/
+│   ├── styles/
+│   └── fonts/
+├── components/
+│   ├── base/
+│   ├── common/
+│   └── layout/
+├── composables/
+├── pages/
+├── router/
+├── store/
+├── types/
+└── utils/
+```
+
+### 各ディレクトリの役割
+
+#### components
+- 再利用可能なコンポーネント
+- ベースコンポーネント
+- レイアウトコンポーネント
+
+#### composables
+- 再利用可能なロジック
+- カスタムフック
+- ユーティリティ関数
+
+#### pages
+- ページコンポーネント
+- ルーティング設定
+- レイアウト定義
+
+#### store
+- Piniaストア
+- 状態管理
+- アクション
+
+## コーディング例
+
+### コンポーネント
+```vue
+<template>
+  <div class="user-card">
+    <h2>{{ user.name }}</h2>
+    <p>{{ user.email }}</p>
+    <button @click="handleClick">編集</button>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import type { User } from '@/types'
+
+interface Props {
+  user: User
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits<{
+  (e: 'edit', id: number): void
+}>()
+
+const handleClick = () => {
+  emit('edit', props.user.id)
+}
+</script>
+
+<style scoped>
+.user-card {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+</style>
+```
+
+### ストア
+```typescript
+import { defineStore } from 'pinia'
+import type { User } from '@/types'
+
+interface UserState {
+  users: User[]
+  loading: boolean
+  error: string | null
+}
+
+export const useUserStore = defineStore('user', {
+  state: (): UserState => ({
+    users: [],
+    loading: false,
+    error: null
+  }),
+
+  actions: {
+    async fetchUsers() {
+      this.loading = true
+      try {
+        const response = await fetch('/api/users')
+        this.users = await response.json()
+      } catch (error) {
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
+    }
+  }
+})
+```
+
+### カスタムフック
+```typescript
+import { ref, onMounted } from 'vue'
+import type { User } from '@/types'
+
+export function useUser(id: number) {
+  const user = ref<User | null>(null)
+  const loading = ref(true)
+  const error = ref<string | null>(null)
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch(`/api/users/${id}`)
+      user.value = await response.json()
+    } catch (e) {
+      error.value = e.message
+    } finally {
+      loading.value = false
+    }
+  }
+
+  onMounted(fetchUser)
+
+  return {
+    user,
+    loading,
+    error
+  }
+}
+```
+
+## テスト
+
+### テスト構造
+```
+tests/
+├── unit/
+│   ├── components/
+│   └── composables/
+└── e2e/
+```
+
+### テスト命名規則
+- テストファイル名は`{コンポーネント名}.spec.ts`
+- テストケース名は`describe`でグループ化
+- テスト名は`it`で記述
+
+### テスト例
+```typescript
+import { mount } from '@vue/test-utils'
+import UserCard from '@/components/UserCard.vue'
+
+describe('UserCard', () => {
+  it('renders user information correctly', () => {
+    const user = {
+      id: 1,
+      name: 'John Doe',
+      email: 'john@example.com'
+    }
+
+    const wrapper = mount(UserCard, {
+      props: { user }
+    })
+
+    expect(wrapper.find('h2').text()).toBe('John Doe')
+    expect(wrapper.find('p').text()).toBe('john@example.com')
+  })
+
+  it('emits edit event when button is clicked', async () => {
+    const user = {
+      id: 1,
+      name: 'John Doe',
+      email: 'john@example.com'
+    }
+
+    const wrapper = mount(UserCard, {
+      props: { user }
+    })
+
+    await wrapper.find('button').trigger('click')
+
+    expect(wrapper.emitted('edit')).toBeTruthy()
+    expect(wrapper.emitted('edit')[0]).toEqual([1])
+  })
+})
+```
+
+## パフォーマンス
+
+### 最適化
+- コンポーネントの分割
+- 遅延ロード
+- メモ化
+- 仮想スクロール
+
+### キャッシュ
+- ルートキャッシュ
+- コンポーネントキャッシュ
+- APIレスポンスキャッシュ
+
+## セキュリティ
+
+### 入力値の検証
+- フォームバリデーション
+- XSS対策
+- CSRF対策
+
+### 認証・認可
+- トークンベースの認証
+- ルートガード
+- 権限チェック
+
+## デプロイメント
+
+### ビルド
+- 本番用ビルド
+- ソースマップ
+- アセット最適化
+
+### 環境変数
+- `.env`ファイル
+- 環境別設定
+- 機密情報の管理
