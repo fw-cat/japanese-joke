@@ -42,6 +42,6 @@ export const japaneseJokeService = {
     author_name?: string 
   }): Promise<JapaneseJokePost> => {
     const response = await apiClient.post('/posts', post)
-    return response.data.posts
+    return response.data
   }
 }

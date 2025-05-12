@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::apiResource("/theme", ThemeController::class)->only([
-    "index",
+    "index", "show"
 ]);
 
-Route::apiResource("/posts", PostController::class);
+Route::post("/posts", [PostController::class, "store"]);

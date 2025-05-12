@@ -3,24 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Post\StoreRequest;
+use App\Services\Post\StoreService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request, StoreService $service): JsonResponse
     {
-        //
+        $service->excute($request);
+        return new JsonResponse([
+            'posts' => [],
+        ], Response::HTTP_CREATED);
     }
 
     /**

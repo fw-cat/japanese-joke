@@ -27,5 +27,13 @@ class Theme extends Model
     protected $casts = [
         'status' => ThemeStatus::class,
     ];
-    
+
+    /**
+     * 投稿
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<Post>
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }
