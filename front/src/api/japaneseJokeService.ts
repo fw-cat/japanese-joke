@@ -26,22 +26,22 @@ export const japaneseJokeService = {
   },
 
   /**
-   * Get submissions for a specific theme
+   * Get posts for a specific theme
    */
-  getSubmissions: async (themeId: number): Promise<JapaneseJokePost[]> => {
-    const response = await apiClient.get(`/posts/${themeId}`)
-    return response.data
+  getPosts: async (themeId: number): Promise<JapaneseJokePost[]> => {
+    const response = await apiClient.get(`/theme/${themeId}`)
+    return response.data.posts
   },
 
   /**
    * Submit a new dajare
    */
-  submitDajare: async (submission: { 
+  submitJapaneseJoke: async (post: { 
     theme_id: number, 
     content: string, 
     author_name?: string 
   }): Promise<JapaneseJokePost> => {
-    const response = await apiClient.post('/posts', submission)
-    return response.data
+    const response = await apiClient.post('/posts', post)
+    return response.data.posts
   }
 }

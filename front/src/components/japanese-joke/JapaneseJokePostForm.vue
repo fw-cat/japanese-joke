@@ -31,7 +31,7 @@ const submitDajare = async () => {
   try {
     isSubmitting.value = true;
     
-    await japaneseJokeService.submitDajare({
+    await japaneseJokeService.submitJapaneseJoke({
       theme_id: props.currentTheme.id,
       content: content.value,
       author_name: authorName.value || undefined,

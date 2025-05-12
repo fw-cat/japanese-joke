@@ -2,20 +2,20 @@
 import { ref, onMounted, watch } from 'vue';
 import { japaneseJokeService, type JapaneseJokePost, type JapaneseJokeTheme } from '../../api/japaneseJokeService';
 import LoadingSpinner from '../ui/LoadingSpinner.vue';
-import JapaneseJokeSubmissionCard from './JapaneseJokeSubmissionCard.vue';
+import JapaneseJokePostCard from './JapaneseJokePostCard.vue';
 
 const props = defineProps<{
   currentTheme: JapaneseJokeTheme | null
   refreshTrigger?: number
 }>();
 
-const submissions = ref<JapaneseJokePost[]>([]);
+const posts = ref<JapaneseJokePost[]>([]);
 const isLoading = ref(true);
 const isError = ref(false);
 
-const loadSubmissions = async () => {
+const loadPosts = async () => {
   if (!props.currentTheme) {
-    submissions.value = [];
+    posts.value = [];
     isLoading.value = false;
     return;
   }
@@ -24,10 +24,10 @@ const loadSubmissions = async () => {
     isLoading.value = true;
     isError.value = false;
     
-    const data = await japaneseJokeService.getSubmissions(props.currentTheme.id);
-    submissions.value = data;
+    const data = await japaneseJokeService.getPosts(props.currentTheme.id);
+    posts.value = data;
   } catch (error) {
-    console.error('Failed to load submissions:', error);
+    console.error('Failed to load posts:', error);
     isError.value = true;
   } finally {
     isLoading.value = false;
@@ -36,21 +36,21 @@ const loadSubmissions = async () => {
 
 onMounted(() => {
   if (props.currentTheme) {
-    loadSubmissions();
+    loadPosts();
   }
 });
 
 watch(() => props.currentTheme, () => {
   if (props.currentTheme) {
-    loadSubmissions();
+    loadPosts();
   } else {
-    submissions.value = [];
+    posts.value = [];
   }
 });
 
 watch(() => props.refreshTrigger, () => {
   if (props.currentTheme) {
-    loadSubmissions();
+    loadPosts();
   }
 });
 </script>
@@ -62,7 +62,7 @@ watch(() => props.refreshTrigger, () => {
         <span>投稿されただじゃれ</span>
         <button 
           v-if="currentTheme" 
-          @click="loadSubmissions" 
+          @click="loadPosts" 
           class="ml-2 p-2 text-primary-600 hover:text-primary-800 transition-colors"
           title="更新"
         >
@@ -78,7 +78,7 @@ watch(() => props.refreshTrigger, () => {
       
       <div v-else-if="isError" class="py-8 text-center">
         <p class="text-red-500 mb-4">投稿の読み込みに失敗しました</p>
-        <button @click="loadSubmissions" class="btn-primary">
+        <button @click="loadPosts" class="btn-primary">
           再試行
         </button>
       </div>
@@ -87,15 +87,15 @@ watch(() => props.refreshTrigger, () => {
         <p>お題を選択すると、投稿されただじゃれが表示されます</p>
       </div>
       
-      <div v-else-if="submissions.length === 0" class="py-8 text-center text-gray-500">
+      <div v-else-if="posts.length === 0" class="py-8 text-center text-gray-500">
         <p>まだ投稿がありません。最初の投稿者になりましょう！</p>
       </div>
       
       <div v-else class="space-y-4">
-        <JapaneseJokeSubmissionCard
-          v-for="submission in submissions"
-          :key="submission.id"
-          :submission="submission"
+        <JapaneseJokePostCard
+          v-for="post in posts"
+          :key="post.id"
+          :post="post"
         />
       </div>
     </div>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import JapaneseJokeTheme from '../components/japanese-joke/JapaneseJokeTheme.vue';
-import JapaneseJokeSubmissionForm from '../components/japanese-joke/JapaneseJokeSubmissionForm.vue';
-import JapaneseJokeSubmissionList from '../components/japanese-joke/JapaneseJokeSubmissionList.vue';
+import JapaneseJokePostForm from '../components/japanese-joke/JapaneseJokePostForm.vue';
+import JapaneseJokePostList from '../components/japanese-joke/JapaneseJokePostList.vue';
 import type { JapaneseJokeTheme as JapaneseJokeThemeType } from '../api/japaneseJokeService';
 
 const currentTheme = ref<JapaneseJokeThemeType | null>(null);
@@ -34,12 +34,12 @@ const handleSubmitSuccess = () => {
       </section>
       
       <section>
-        <JapaneseJokeSubmissionForm 
+        <JapaneseJokePostForm 
           :currentTheme="currentTheme" 
           :onSubmitSuccess="handleSubmitSuccess"
         />
         
-        <JapaneseJokeSubmissionList 
+        <JapaneseJokePostList 
           :currentTheme="currentTheme"
           :refreshTrigger="refreshCounter"
         />
