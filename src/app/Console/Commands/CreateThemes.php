@@ -4,7 +4,11 @@ namespace App\Console\Commands;
 
 use App\Enums\ThemeStatus;
 use App\Models\Theme;
+use App\Services\OpenAI\ChatService;
+use App\Services\OpenAIService;
 use Illuminate\Console\Command;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class CreateThemes extends Command
 {
@@ -13,7 +17,7 @@ class CreateThemes extends Command
      *
      * @var string
      */
-    protected $signature = 'app:create-themes';
+    protected $signature = 'j-joke:create-themes';
 
     /**
      * The console command description.
@@ -27,11 +31,15 @@ class CreateThemes extends Command
      */
     public function handle()
     {
-        // TODO: ChatGPT等からデータを生成する
-        $themes = [
-            'くつ', 'さくらんぼ', 'かさ', 'いぬ', 'たまご',
-            'ゴールデンウィーク',  '五月晴れ', '五月病', 'こいのぼり', '梅雨前の晴れ',
-        ];
+        // Serviceの初期化
+        $service = new ChatService(app('log'));
+        $prompts = config('openai.prompts.create_theme');
+        $prompts['prompt'] = sprintf($prompts['prompt'], Carbon::now()->format('Y年m月d日'));
+
+        $service->setPrompts($prompts);
+        $themes = $service->main(new Request());
+        $themes = json_decode($themes, true);
+        // var_dump($themes);
 
         // 現在のThemeをINACTIVE化
         Theme::where([
@@ -44,7 +52,7 @@ class CreateThemes extends Command
         foreach ($themes as $theme) {
             // 同じコンテンツがある場合は上書き 
             Theme::updateOrCreate(
-                ['content' => $theme],
+                ['content' => $theme['theme']],
                 ['status' => ThemeStatus::ACTIVE]
             );
         }

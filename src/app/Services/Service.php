@@ -13,11 +13,11 @@ abstract class Service
     /**
      * 標準のLoggerインスタンス
      */
-    protected $logger;
+    protected LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface|null $logger = null)
     {
-        $this->logger = $logger;
+        $this->logger = $logger ?? app('log');
     }
 
     /**
