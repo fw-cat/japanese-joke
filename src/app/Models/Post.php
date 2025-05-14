@@ -39,6 +39,6 @@ class Post extends Model
      */
     public function scopeChecked($query)
     {
-        return $query->where('status', PostStatus::IS_CHECKED);
+        return $query->where('status', PostStatus::NICE_JOKE);
     }
 }
