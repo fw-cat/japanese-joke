@@ -2,32 +2,31 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Request;
 use OpenAI\Laravel\Facades\OpenAI;
 
 abstract class OpenAIService extends Service
 {
+    /**
+     * Prompt設定
+     */
+    protected array $prompts;
 
-    public function sendRequest(array $prompt): string|null
+    public function setPrompts(array $prompts): void
     {
-        try {
-            $chat = OpenAI::chat()->create([
-                'model' => $prompt['model'],
-                'messages' => [
-                    [
-                        'role' => 'user',
-                        'content' => $prompt['prompt'],
-                    ],
-                ],
-            ]);
-            $this->logger->debug(print_r([
-                'caht' => $chat,
-                'message' => $chat->choices[0]->message,
-            ], true));
+        $this->prompts = $prompts;
+    }
 
-            return $chat->choices[0]->message->content;
-        } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
-            return null;
-        }
+    /**
+     * リクエストを送信する
+     */
+    abstract public function sendRequest(): mixed;
+
+    /**
+     * メイン処理はリクエストを送信するだけ
+     */
+    public function main(Request $request): mixed
+    {
+        return $this->sendRequest($this->prompts);
     }
 }
