@@ -32,14 +32,12 @@ class CreateThemes extends Command
     public function handle()
     {
         // Serviceの初期化
-        $service = new ChatService(app('log'));
+        $service = new ChatService();
         $prompts = config('openai.prompts.create_theme');
         $prompts['prompt'] = sprintf($prompts['prompt'], Carbon::now()->format('Y年m月d日'));
-
         $service->setPrompts($prompts);
-        $themes = $service->main(new Request());
+        $themes = $service->sendRequest();
         $themes = json_decode($themes, true);
-        // var_dump($themes);
 
         // 現在のThemeをINACTIVE化
         Theme::where([
