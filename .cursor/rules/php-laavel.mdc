@@ -70,10 +70,6 @@ app/
 │   └── Requests/
 ├── Models/
 ├── Services/
-├── Repositories/
-├── Events/
-├── Listeners/
-├── Jobs/
 ├── Mail/
 ├── Notifications/
 ├── Policies/
@@ -100,12 +96,6 @@ app/
 - 依存性注入を使用
 - トランザクション処理を適切に実装
 - ビジネスロジックの集約
-
-#### Repositories
-- インターフェースを実装
-- クエリビルダの抽象化
-- キャッシュ戦略の実装
-- データアクセス層の分離
 
 ## コーディング例
 
@@ -217,46 +207,61 @@ tests/
 ```
 
 ### テスト命名規則
-- テストクラス名は`{テスト対象クラス名}Test`
-- テストメソッド名は`test_{テスト内容}`
-- データプロバイダは`{テストメソッド名}DataProvider`
+- テストクラス名は`{テスト対象コントローラクラス名}Test`
+- テストメソッド名は`[プレフィックス、error/success]_{テスト内容を簡単に記載}`
+- テスト記法はPestを利用して記載する
 
 ### テスト例
 ```php
 <?php
 
-namespace Tests\Unit\Services;
+use App\Models\User;
+use Illuminate\Http\Response;
 
-use App\Services\UserService;
-use Tests\TestCase;
+use function Pest\Laravel\{actingAs, getJson, postJson};
 
-class UserServiceTest extends TestCase
-{
-    public function test_create_user(): void
-    {
-        // テストコード
-    }
+// 未ログインでアクセスした場合は401エラーが返る
+it('[error]not login access.', function () {
+    getJson('/users', [])
+        ->assertStatus(Response::HTTP_UNAUTHORIZED);
+});
 
-    /**
-     * @dataProvider createUserDataProvider
-     */
-    public function test_create_user_with_invalid_data(array $data): void
-    {
-        // テストコード
-    }
+// ユーザは存在するがパスワードが間違っている場合は401エラーが返る
+it('[error]password error.', function () {
+    $user = User::factory()->create();
+    $response = postJson('/users/login', [
+        'email' => $user->email,
+        'password' => 'wrong_password',
+    ]);
+    $response->assertStatus(Response::HTTP_NOT_FOUND);
+});
 
-    public function createUserDataProvider(): array
-    {
-        return [
-            'empty_name' => [
-                'data' => [
-                    'name' => '',
-                    'email' => 'test@example.com',
-                ],
-            ],
-        ];
-    }
-}
+// ユーザは存在しない場合は401エラーが返る
+it('[error]user not found.', function () {
+    $response = postJson('/users/login', [
+        'email' => 'nonexistent@example.com',
+        'password' => 'password',
+    ]);
+    $response->assertStatus(Response::HTTP_NOT_FOUND);
+}); 
+
+// パスワードパラメータがない場合は401エラーが返る
+it('[error]password parameter is required.', function () {
+    $response = postJson('/users/login', [
+        'email' => 'test@example.com',
+    ]);
+    $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+});
+
+// ログインしている場合は200が返る
+it('[success]login success.', function () {
+    $user = User::factory()->create();
+    $response = postJson('/users/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+    $response->assertStatus(Response::HTTP_OK);
+});
 ```
 
 ## セキュリティ
@@ -290,6 +295,7 @@ class UserServiceTest extends TestCase
 - Laravel Mix
 - Laravel Debugbar
 - Laravel Tinker
+- PestPHP
 
 ## デプロイメント
 
